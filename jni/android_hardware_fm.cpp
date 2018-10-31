@@ -684,7 +684,7 @@ static jint android_hardware_fmradio_FmReceiverJNI_acquireFdNative
        return FM_JNI_FAILURE;
     }
 
-    property_get("vendor.bluetooth.soc", value, NULL);
+    property_get("vendor.qcom.bluetooth.soc", value, NULL);
 
     ALOGD("BT soc is %s\n", value);
 
@@ -728,7 +728,7 @@ static jint android_hardware_fmradio_FmReceiverJNI_closeFdNative
 {
     char value[PROPERTY_VALUE_MAX] = {'\0'};
 
-    property_get("vendor.bluetooth.soc", value, NULL);
+    property_get("vendor.qcom.bluetooth.soc", value, NULL);
 
     ALOGD("BT soc is %s\n", value);
 
@@ -743,7 +743,7 @@ static jint android_hardware_fmradio_FmReceiverJNI_closeFdNative
 static bool is_soc_cherokee() {
 
     char value[PROPERTY_VALUE_MAX] = {'\0'};
-    property_get("vendor.bluetooth.soc", value, NULL);
+    property_get("vendor.qcom.bluetooth.soc", value, NULL);
     ALOGD("BT soc is %s\n", value);
 
     if(strcmp(value, "cherokee") == 0)
@@ -1214,7 +1214,7 @@ static jint android_hardware_fmradio_FmReceiverJNI_setNotchFilterNative
     int band;
     int err = 0;
 
-    property_get("vendor.bluetooth.soc", value, NULL);
+    property_get("vendor.qcom.bluetooth.soc", value, NULL);
 
     ALOGD("BT soc is %s\n", value);
 
@@ -1278,7 +1278,7 @@ static jint android_hardware_fmradio_FmReceiverJNI_setAnalogModeNative
     int i=0;
     char value[PROPERTY_VALUE_MAX] = {'\0'};
 
-    property_get("vendor.bluetooth.soc", value, NULL);
+    property_get("vendor.qcom.bluetooth.soc", value, NULL);
 
     ALOGD("BT soc is %s\n", value);
 
