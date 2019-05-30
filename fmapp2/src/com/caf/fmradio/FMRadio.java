@@ -827,6 +827,8 @@ public class FMRadio extends Activity
                e.printStackTrace();
            }
        }
+       disableRadio();
+       enableRadio();
    }
 
    private static final int RECORDTIMER_EXPIRED = 0x1003;
