@@ -288,7 +288,16 @@ public class FMRadioService extends Service
       getA2dpStatusAtStart();
 
       mGainFocusReq = requestAudioFocus();
-
+      AudioManager mAudioManager =
+          (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+      AudioDeviceInfo[] deviceList = mAudioManager.getDevices(AudioManager.GET_DEVICES_OUTPUTS);
+      for (int index = 0; index < deviceList.length; index++) {
+          if ((deviceList[index].getType() == AudioDeviceInfo.TYPE_WIRED_HEADSET ) ||
+                   (deviceList[index].getType() == AudioDeviceInfo.TYPE_WIRED_HEADPHONES )){
+              mHeadsetPlugged = true;
+              break;
+          }
+      }
    }
 
    @Override
@@ -743,7 +752,7 @@ public class FMRadioService extends Service
     final Runnable    mFmVolumeHandler = new Runnable() {
         public void run() {
             try {
-                Thread.sleep(1000);
+                Thread.sleep(1500);
             } catch (Exception ex) {
                 Log.d( LOGTAG, "RunningThread InterruptedException");
                 return;
