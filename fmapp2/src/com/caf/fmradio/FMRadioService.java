@@ -159,6 +159,7 @@ public class FMRadioService extends Service
    private boolean mA2dpDisconnected = false;
    private boolean mA2dpConnected = false;
 
+   private boolean mFmStats = false;
    //Install the death receipient
    private IBinder.DeathRecipient mDeathRecipient;
    private FMDeathRecipient mFMdr;
@@ -1314,7 +1315,7 @@ public class FMRadioService extends Service
        Intent mediaButtonIntent =
                new Intent(Intent.ACTION_MEDIA_BUTTON).setComponent(fmRadio);
        PendingIntent pi = PendingIntent.getBroadcast(getApplicationContext(), 0,
-                          mediaButtonIntent, 0);
+                          mediaButtonIntent, PendingIntent.FLAG_IMMUTABLE);
        mSession.setMediaButtonReceiver(pi);
 
        mStoppedOnFocusLoss = false;
@@ -1740,6 +1741,11 @@ public class FMRadioService extends Service
            boolean bTempSpeaker = mSpeakerPhoneOn ; //need to restore SpeakerPhone
            boolean bTempMute = mMuted;// need to restore Mute status
            int bTempCall = mCallStatus;//need to restore call status
+           if (mSession != null && mSession.isActive()) {
+               Log.d(LOGTAG, "onCallStateChanged: State - " + state
+                       + " Session is Active: " + mSession.isActive() );
+               mSession.setActive(false);
+           }
            if (isFmOn() && fmOff()) {
                if((mServiceInUse) && (mCallbacks != null)) {
                    try {
@@ -1987,7 +1993,7 @@ public class FMRadioService extends Service
             .setContentTitle(isFmOn() ? getString(R.string.app_name) : "")
             .setContentText(isFmOn() ? getTunedFrequencyString() : "")
             .setContentIntent(PendingIntent.getActivity(this,
-                0, new Intent("com.caf.fmradio.FMRADIO_ACTIVITY"), 0))
+                0, new Intent("com.caf.fmradio.FMRADIO_ACTIVITY"), PendingIntent.FLAG_IMMUTABLE))
             .setOngoing(true)
             .build();
 
@@ -2642,6 +2648,9 @@ public class FMRadioService extends Service
            /* reset SSR flag */
            mIsSSRInProgressFromActivity = false;
          }
+
+         if (mReceiver != null)
+            mFmStats = mReceiver.getFmStatsProp();
       }
       return(bStatus);
    }
@@ -4163,10 +4172,11 @@ public class FMRadioService extends Service
           else
              return Integer.MIN_VALUE;
    }
+
    private void setAlarmSleepExpired (long duration) {
        Intent i = new Intent(SLEEP_EXPIRED_ACTION);
        AlarmManager am = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
-       PendingIntent pi = PendingIntent.getBroadcast(this, 0, i, 0);
+       PendingIntent pi = PendingIntent.getBroadcast(this, 0, i, PendingIntent.FLAG_IMMUTABLE);
        Log.d(LOGTAG, "delayedStop called" + SystemClock.elapsedRealtime() + duration);
        am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + duration, pi);
        mSleepActive = true;
@@ -4174,33 +4184,33 @@ public class FMRadioService extends Service
    private void cancelAlarmSleepExpired() {
        Intent i = new Intent(SLEEP_EXPIRED_ACTION);
        AlarmManager am = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
-       PendingIntent pi = PendingIntent.getBroadcast(this, 0, i, 0);
+       PendingIntent pi = PendingIntent.getBroadcast(this, 0, i, PendingIntent.FLAG_IMMUTABLE);
        am.cancel(pi);
        mSleepActive = false;
    }
    private void setAlarmRecordTimeout(long duration) {
        Intent i = new Intent(RECORD_EXPIRED_ACTION);
        AlarmManager am = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
-       PendingIntent pi = PendingIntent.getBroadcast(this, 0, i, 0);
+       PendingIntent pi = PendingIntent.getBroadcast(this, 0, i, PendingIntent.FLAG_IMMUTABLE);
        Log.d(LOGTAG, "delayedStop called" + SystemClock.elapsedRealtime() + duration);
        am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + duration, pi);
    }
    private void cancelAlarmRecordTimeout() {
        Intent i = new Intent(RECORD_EXPIRED_ACTION);
        AlarmManager am = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
-       PendingIntent pi = PendingIntent.getBroadcast(this, 0, i, 0);
+       PendingIntent pi = PendingIntent.getBroadcast(this, 0, i, PendingIntent.FLAG_IMMUTABLE);
        am.cancel(pi);
    }
    private void setAlarmDelayedServiceStop() {
        Intent i = new Intent(SERVICE_DELAYED_STOP_ACTION);
        AlarmManager am = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
-       PendingIntent pi = PendingIntent.getBroadcast(this, 0, i, 0);
+       PendingIntent pi = PendingIntent.getBroadcast(this, 0, i, PendingIntent.FLAG_IMMUTABLE);
        am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + IDLE_DELAY, pi);
    }
    private void cancelAlarmDealyedServiceStop() {
        Intent i = new Intent(SERVICE_DELAYED_STOP_ACTION);
        AlarmManager am = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
-       PendingIntent pi = PendingIntent.getBroadcast(this, 0, i, 0);
+       PendingIntent pi = PendingIntent.getBroadcast(this, 0, i, PendingIntent.FLAG_IMMUTABLE);
        am.cancel(pi);
    }
    private void cancelAlarms() {
